@@ -1,0 +1,11 @@
+.git
+.agents
+.codex
+__pycache__
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+README.md
+test_app.py
+postman_collection.json

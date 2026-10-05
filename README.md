@@ -12,6 +12,15 @@ python3 app.py
 
 The API listens on `http://127.0.0.1:8000`. Data is saved in `items.db`. Use `python3 app.py --port 8080 --db /tmp/test-items.db` to change the port or database. `--host 0.0.0.0` allows connections from other devices; the API has no authentication, so use that only on a trusted network.
 
+### Run with Docker Compose
+
+```bash
+docker compose up --build -d
+curl http://127.0.0.1:8000/health
+```
+
+The container listens on port 8000 and Compose publishes it on localhost. SQLite data is kept in the `items_data` named volume, so it survives container recreation. Stop the API with `docker compose down`; this keeps the volume. To follow logs, run `docker compose logs -f api`.
+
 ## Endpoints
 
 | Method | Path | Action | Success |
