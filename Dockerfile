@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN mkdir /data && chown 10001:10001 /data
 
-COPY app.py .
+COPY app.py VERSION ./
 
 ENV PYTHONUNBUFFERED=1 \
     CRUD_DB_PATH=/data/items.db

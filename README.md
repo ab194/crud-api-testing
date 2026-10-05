@@ -2,6 +2,8 @@
 
 A small Python API for practicing requests in Postman, Burp Suite Repeater, curl, or another HTTP client. It uses only the Python standard library and stores items in SQLite.
 
+Current version: **1.0.0**, recorded in [`VERSION`](VERSION). Run `python3 app.py --version` to check it.
+
 ## Run
 
 Requires Python 3.9 or newer. From this directory:
@@ -56,7 +58,7 @@ Only send `name`, `description`, and `completed` in write requests. Unknown fiel
 curl -i http://127.0.0.1:8000/health
 ```
 
-Returns `200 OK` with `{"status":"ok"}`.
+Returns `200 OK` with `{"status":"ok","version":"1.0.0"}`.
 
 ## Create an item
 
@@ -149,11 +151,19 @@ Errors have a JSON body such as `{"error":"Item not found"}`.
 | `415` | A JSON write request has the wrong `Content-Type`. |
 | `422` | A field is missing, has the wrong type, is not allowed, or a PATCH body is empty. |
 
-## Postman and Burp Suite
+## Postman
 
-Import [`postman_collection.json`](postman_collection.json) into Postman. Run **Create item** first; it saves the returned ID in the collection's `itemId` variable. Then run the other requests. If you build a request manually, select the method and URL above. For writes, select **Body → raw → JSON** and paste the JSON body from the example.
+1. Start the API, then in Postman click **Import** and select [`postman_collection.json`](postman_collection.json). Open the **CRUD API Testing** collection.
+2. Open the collection's **Variables** tab. `baseUrl` is `http://127.0.0.1:8000`; change it if you use another port.
+3. Open **Create item** and click **Send**. A `201 Created` response shows the new item. Its post-response script saves the returned `id` as the collection variable `itemId`.
+4. Send **List items**, **Get item**, **Replace item**, **Patch item**, then **Delete item**. The item requests use `{{itemId}}` in their URLs. Check the response status and JSON below each request; deletion returns `204 No Content`.
+5. To build a request without the collection, choose `POST http://127.0.0.1:8000/api/items`, select **Body → raw → JSON**, enter `{"name":"Manual test"}`, and click **Send**. Copy the returned `id` into `/api/items/{id}` for later requests.
 
-In Burp Suite Repeater, set the target to `127.0.0.1:8000` and send a request such as:
+Run **Create item** again before item requests if you deleted the previous item. No authentication or Postman environment is needed.
+
+## Burp Suite Repeater
+
+Set a Repeater tab's HTTP target to `127.0.0.1:8000`, paste this request, and click **Send**:
 
 ```http
 POST /api/items HTTP/1.1
@@ -163,7 +173,7 @@ Content-Type: application/json
 {"name":"Burp test","completed":false}
 ```
 
-Use the returned ID in later request paths. Burp Repeater calculates `Content-Length` when it sends the request.
+Read the returned `id`, then change the method and path to test `GET`, `PUT`, `PATCH`, or `DELETE /api/items/{id}`. Burp Repeater updates `Content-Length` when sending the request.
 
 ## Test
 

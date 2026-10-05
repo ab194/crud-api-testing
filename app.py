@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 
+__version__ = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 DEFAULT_DB = Path(__file__).with_name("items.db")
 ITEM_PATH = re.compile(r"/api/items/([1-9][0-9]*)")
 FIELDS = {"name", "description", "completed"}
@@ -66,7 +67,7 @@ def validate_item(data, method):
 
 
 class APIHandler(BaseHTTPRequestHandler):
-    server_version = "CRUDTestAPI/1.0"
+    server_version = f"CRUDTestAPI/{__version__}"
 
     def respond(self, status, payload=None, *, headers=None):
         body = b"" if payload is None else json.dumps(payload).encode("utf-8")
@@ -115,7 +116,7 @@ class APIHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         route, item_id = self.route()
         if route == "health":
-            self.respond(200, {"status": "ok"})
+            self.respond(200, {"status": "ok", "version": __version__})
         elif route == "collection":
             with connect(self.server.db_path) as connection:
                 rows = connection.execute("SELECT * FROM items ORDER BY id").fetchall()
@@ -199,6 +200,7 @@ class APIHandler(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description="Run the CRUD test API")
+    parser.add_argument("--version", action="version", version=f"CRUD Test API {__version__}")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--db", default=os.environ.get("CRUD_DB_PATH", str(DEFAULT_DB)))
