@@ -5,7 +5,7 @@ import threading
 import unittest
 from pathlib import Path
 
-from app import APIHandler, ThreadingHTTPServer, initialize_db
+from app import APIHandler, ThreadingHTTPServer, __version__, initialize_db
 
 
 class APITest(unittest.TestCase):
@@ -38,7 +38,7 @@ class APITest(unittest.TestCase):
         return result
 
     def test_crud_and_persistence(self):
-        self.assertEqual(self.request("GET", "/health")[2], {"status": "ok"})
+        self.assertEqual(self.request("GET", "/health")[2], {"status": "ok", "version": __version__})
         self.assertEqual(self.request("GET", "/api/items")[2], {"items": []})
 
         status, headers, item = self.request("POST", "/api/items", {"name": "Test item"})
