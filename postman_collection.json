@@ -1,0 +1,67 @@
+{
+  "info": {
+    "name": "CRUD API Testing",
+    "description": "Run Create item first to set itemId for the other requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "itemId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "List items",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/items" }
+    },
+    {
+      "name": "Create item",
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "if (pm.response.code === 201) {",
+            "  pm.collectionVariables.set('itemId', pm.response.json().id);",
+            "}"
+          ]
+        }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"name\":\"Postman test\",\"description\":\"Created from Postman\",\"completed\":false}" },
+        "url": "{{baseUrl}}/api/items"
+      }
+    },
+    {
+      "name": "Get item",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/items/{{itemId}}" }
+    },
+    {
+      "name": "Replace item",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"name\":\"Replaced item\",\"description\":\"Full update\",\"completed\":false}" },
+        "url": "{{baseUrl}}/api/items/{{itemId}}"
+      }
+    },
+    {
+      "name": "Patch item",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"completed\":true}" },
+        "url": "{{baseUrl}}/api/items/{{itemId}}"
+      }
+    },
+    {
+      "name": "Delete item",
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/api/items/{{itemId}}" }
+    }
+  ]
+}
